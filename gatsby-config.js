@@ -6,6 +6,7 @@
 
 module.exports = {
   /* Your site config here */
+  pathPrefix: "/ScrollPortfolio",
   plugins: [
     `gatsby-plugin-sass`,
     {
