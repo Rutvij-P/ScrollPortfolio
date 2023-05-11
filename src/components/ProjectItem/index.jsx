@@ -15,6 +15,16 @@ const initialState = {
     active: false,
 };
 
+const ActionType = {
+    MOUSE_ENTER: "MOUSE/ENTER",
+    MOUSE_LEAVE: "MOUSE/LEAVE",
+    CHANGE_OPACITY: "CHANGE/OPACITY",
+    MOUSE_COORDINATES: "MOUSE/COORDINATES",
+    CHANGE_ROTATION: "CHANGE/ROTATION",
+    CHANGE_SCALE: "CHANGE/SCALE",
+  };
+  
+
 function reducer (state, action){
     switch(action.type){
         case "MOUSE/ENTER" : {
