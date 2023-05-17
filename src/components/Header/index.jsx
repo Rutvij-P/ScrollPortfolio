@@ -18,7 +18,7 @@ export default function Header() {
         <div className='overlay-nav'>
             <div className='header-container'>
                 <h1 onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><a href='https://www.linkedin.com/in/jivtur/' target="_blank">contact</a></h1>
-                <h1 onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><a href='https://github.com/Rutvij-P' target="_blank">madebyJivtur</a></h1>
+                <h1 onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><a href='https://jivturportfolio.vercel.app' target="_blank">madebyJivtur</a></h1>
             </div>
         </div>
 
