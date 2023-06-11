@@ -6,73 +6,88 @@ import ProjectItem from "../components/ProjectItem";
 import CursorManager from "../components/CustomCursor/CursorManager";
 import CustomCursor from "../components/CustomCursor";
 
-
 export default function Home() {
-    const menuItems = useRef(null);
-    const [renderItems, setRenderItems] = useState(pageData);
+  const menuItems = useRef(null);
+  const [renderItems, setRenderItems] = useState(pageData);
 
-    const cloneItems = () => {
-        const itemHeight = menuItems.current.childNodes[0].offsetHeight;
-        const fitMax = Math.ceil(window.innerHeight / itemHeight);
+  const cloneItems = () => {
+    const itemHeight = menuItems.current.childNodes[0].offsetHeight;
+    const fitMax = Math.ceil(menuItems.current.scrollHeight / itemHeight);
+  
+    const clonedItems = [...renderItems]
+      .filter((_, index) => index < fitMax)
+      .map((target) => target);
+  
+    setRenderItems([...clonedItems, ...renderItems, ...clonedItems]);
+  
+    return clonedItems.length * itemHeight;
+  };
+  
 
-        const clonedItems = [...renderItems]
-            .filter((_, index) => index < fitMax)
-            .map((target)=> target);
+  const getScrollPos = () => {
+    return (
+      (menuItems.current.pageYOffset || menuItems.current.scrollTop) -
+      (menuItems.current.clientTop || 0)
+    );
+  };
 
-            setRenderItems([...renderItems, ...clonedItems]);
-            return clonedItems.length * itemHeight;
-    };
+  const setScrollPos = (pos) => {
+    menuItems.current.scrollTop = pos;
+  };
 
-    const getScrollPos = () => {
-        return(
-            (menuItems.current.pageYOffset || menuItems.current.scrollTop) - (menuItems.current.clientTop || 0)
-        );
-    };
-
-    const setScrollPos = (pos) => {
-        menuItems.current.scrollTop = pos;
+  const initScroll = () => {
+    const scrollPos = getScrollPos();
+    if (scrollPos <= 0) {
+      setScrollPos(1);
     }
+  };
 
-    const initScroll = () => {
+  useEffect(() => {
+    let clonesHeight = 0;
+
+    const scrollUpdate = () => {
         const scrollPos = getScrollPos();
-        if(scrollPos <= 0){
-            setScrollPos(1);
+        if (scrollPos <= 0) {
+          setScrollPos(menuItems.current.scrollHeight - clonesHeight);
+        } else if (scrollPos >= menuItems.current.scrollHeight - window.innerHeight) {
+          const itemHeight = menuItems.current.childNodes[0].offsetHeight;
+          const clonedItemsHeight = cloneItems();
+          setScrollPos(scrollPos - clonedItemsHeight);
         }
-    }
-    useEffect(() => {
+      };      
 
-        const clonesHeight = cloneItems();
-        initScroll();
+    menuItems.current.style.scrollBehavior = "unset";
 
-        menuItems.current.style.scrollBehavior = 'unset';
-        const scrollUpdate = () => {
-            const scrollPos = getScrollPos();
-            if(clonesHeight + scrollPos >= menuItems.current.scrollHeight){
-                setScrollPos(1);
-            } else if(scrollPos <= 0) {
-                setScrollPos(menuItems.current.scrollHeight - clonesHeight);
-            }
-        };
-        menuItems.current.addEventListener('scroll', scrollUpdate);
+    const handleResize = () => {
+      clonesHeight = cloneItems();
+      initScroll();
+    };
 
-        return () => {
-            menuItems.current.removeEventListener('scroll', scrollUpdate);
-        };
-    },
-    []);
+    window.addEventListener("resize", handleResize);
 
-  return(
+    clonesHeight = cloneItems();
+    initScroll();
+
+    menuItems.current.addEventListener("scroll", scrollUpdate);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      menuItems.current.removeEventListener("scroll", scrollUpdate);
+    };
+  }, []);
+
+  return (
     <CursorManager>
-        <CustomCursor />
-        <Header />
-        <div className="main-container" id="main-container">
-            <ul ref={menuItems}>
-                {renderItems.map((project, index) => (
-                    <ProjectItem key={index} project={project} itemIndex={index}  />
-                ))}
-            </ul>
-        </div>
-        <Footer />
+      <CustomCursor />
+      <Header />
+      <div className="main-container" id="main-container">
+        <ul ref={menuItems}>
+          {renderItems.map((project, index) => (
+            <ProjectItem key={index} project={project} itemIndex={index} />
+          ))}
+        </ul>
+      </div>
+      <Footer />
     </CursorManager>
   );
 }
